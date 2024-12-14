@@ -52,7 +52,7 @@
     <script>
         async function controlLED(action) {
             try {
-                const response = await fetch('http://localhost:3000/api/led', {
+                const response = await fetch('https://remoteledcontrollerbackend-ylhv6kjp.b4a.run//api/led', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action })
@@ -68,7 +68,7 @@
 
         async function updateLedState() {
             try {
-                const response = await fetch('http://localhost:3000/api/led');
+                const response = await fetch('https://remoteledcontrollerbackend-ylhv6kjp.b4a.run//api/led');
                 const data = await response.json();
                 document.getElementById('led-state').innerText = `LED is: ${data.state.toUpperCase()}`;
             } catch (error) {
