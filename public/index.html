@@ -48,11 +48,18 @@
             transform: scale(0.95);
             box-shadow: none;
         }
+        #pi-status {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        #pi-status.disconnected {
+            color: red;
+        }
     </style>
     <script>
         async function controlLED(action) {
             try {
-                const response = await fetch('https://remoteledcontrollerbackend-ylhv6kjp.b4a.run//api/led', {
+                const response = await fetch('/api/led', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action })
@@ -68,7 +75,7 @@
 
         async function updateLedState() {
             try {
-                const response = await fetch('https://remoteledcontrollerbackend-ylhv6kjp.b4a.run//api/led');
+                const response = await fetch('/api/led');
                 const data = await response.json();
                 document.getElementById('led-state').innerText = `LED is: ${data.state.toUpperCase()}`;
             } catch (error) {
@@ -76,7 +83,30 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', updateLedState);
+        async function checkPiStatus() {
+            try {
+                const response = await fetch('/api/pi_hooked');
+                const data = await response.json();
+                const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+
+                if (currentTime > data.lastAccess + 10) {
+                    const piStatusElement = document.getElementById('pi-status');
+                    piStatusElement.innerText = 'Pi is Disconnected';
+                    piStatusElement.classList.add('disconnected');
+                } else {
+                    const piStatusElement = document.getElementById('pi-status');
+                    piStatusElement.innerText = 'Pi is Connected';
+                    piStatusElement.classList.remove('disconnected');
+                }
+            } catch (error) {
+                alert('Error checking Pi status: ' + error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateLedState();
+            setInterval(checkPiStatus, 5000); // Check Pi status every 5 seconds
+        });
     </script>
 </head>
 <body>
@@ -90,6 +120,7 @@
         <button onclick="controlLED('off')">Turn Off 🔅</button>
         <button onclick="controlLED('blink_square')">Blink Scheme (Square Wave) ⏰</button>
         <button onclick="controlLED('blink_dual')">Blink Scheme (Dual Blink) ❤️</button>
+        <p id="pi-status">Checking Pi status...</p>
     </main>
 </body>
 </html>
