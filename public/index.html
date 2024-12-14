@@ -89,7 +89,7 @@
                 const data = await response.json();
                 const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
 
-                if (currentTime > data.lastAccess + 10) {
+                if (currentTime > data.lastAccess + 5) {
                     const piStatusElement = document.getElementById('pi-status');
                     piStatusElement.innerText = 'Pi is Disconnected';
                     piStatusElement.classList.add('disconnected');
