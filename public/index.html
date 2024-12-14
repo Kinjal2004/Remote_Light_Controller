@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED Controller 💡</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333333;
+        }
+        header {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        main {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        h1 {
+            margin: 0 0 20px;
+            font-size: 1.8rem;
+        }
+        button {
+            padding: 15px 20px;
+            font-size: 1rem;
+            color: #333333;
+            background-color: #ffffff;
+            border: 2px solid #cccccc;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 200px;
+        }
+        button:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        button:active {
+            transform: scale(0.95);
+            box-shadow: none;
+        }
+    </style>
+    <script>
+        async function controlLED(action) {
+            try {
+                const response = await fetch('http://localhost:3000/api/led', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action })
+                });
+                const data = await response.json();
+                if (data.state) {
+                    document.getElementById('led-state').innerText = `LED is: ${data.state.toUpperCase()}`;
+                }
+            } catch (error) {
+                alert('Error controlling LED: ' + error.message);
+            }
+        }
+
+        async function updateLedState() {
+            try {
+                const response = await fetch('http://localhost:3000/api/led');
+                const data = await response.json();
+                document.getElementById('led-state').innerText = `LED is: ${data.state.toUpperCase()}`;
+            } catch (error) {
+                alert('Error fetching LED state: ' + error.message);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', updateLedState);
+    </script>
+</head>
+<body>
+    <header>
+        LED Controller 💡
+    </header>
+    <main>
+        <h1>Select a Button to Control the LED Pin (PicoW)</h1>
+        <p id="led-state">Loading LED state...</p>
+        <button onclick="controlLED('on')">Turn On 🔆</button>
+        <button onclick="controlLED('off')">Turn Off 🔅</button>
+        <button onclick="controlLED('blink_square')">Blink Scheme (Square Wave) ⏰</button>
+        <button onclick="controlLED('blink_dual')">Blink Scheme (Dual Blink) ❤️</button>
+    </main>
+</body>
+</html>
